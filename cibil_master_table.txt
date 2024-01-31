@@ -1,0 +1,30 @@
+Drop table nbu.cibil_master_table;
+create table nbu.cibil_master_table ( 
+segment varchar(10),
+version int,
+enquirymemberid varchar(20),
+subjectreturncode int,
+enquirycontrolnumber varchar(30),
+dateprocessed date,
+timeprocessed date,
+inserted_at date,
+updated_at date,
+response_id varchar(32),
+master_id int 
+)
+
+
+truncate table nbu.cibil_master_table;
+insert into nbu.cibil_master_table
+select distinct
+segment ,
+cast( version as int) ,
+ enquirymemberid  ,
+ cast( subjectreturncode as int) ,
+ enquirycontrolnumber  ,
+to_date(LPAD(TRIM(BOTH ' ' FROM dateprocessed), 8, '0') , 'DDMMYYYY') as dateprocessed,
+to_date(LPAD(TRIM(BOTH ' ' FROM timeprocessed), 8, '0') , 'DDMMYYYY') as timeprocessed,
+getdate(), getdate()  ,
+response_id,
+ROW_NUMBER() over(order by response_id)
+from nbu.stg_cibil_data
